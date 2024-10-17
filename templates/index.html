@@ -1,0 +1,36 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ML Model Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Upload a CSV file for Prediction</h1>
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <label for="file">Select CSV file:</label>
+            <input type="file" id="file" name="file" accept=".csv" required><br><br>
+            <button type="submit">Predict</button>
+        </form>
+
+        <!-- <div id="result">
+            {% if predictions %}
+                <h2>Predictions: {{ predictions }}</h2>
+            {% endif %}
+        </div>-->
+        {% if image_url %}
+            <div id="image-container">
+                <h2>Prediction Image</h2>
+                <img src="{{ image_url }}" alt="Prediction Image" style="width: 300px;">
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // This script handles the form submission and result display (optional AJAX logic can go here)
+    </script>
+</body>
+</html>
