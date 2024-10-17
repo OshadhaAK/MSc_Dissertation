@@ -22,8 +22,12 @@ MSc_Dissertation/
 To install the packages listed in requirements.txt on another machine or environment, you can use:
 ```bash
 pip3 install -r requirements.txt
+```
 
 ## Run the Flask app:
 
+```bash
 python app.py
+```
+
 Test the app by visiting http://127.0.0.1:5000/ in your browser.
