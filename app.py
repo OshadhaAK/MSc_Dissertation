@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, request, jsonify, render_template, url_for
+from flask import Flask, request, jsonify, render_template, url_for, send_file
 import pickle
 import numpy as np
 import pandas as pd
@@ -7,6 +7,7 @@ from model.preprocessing import preprocess_input, preprocess_csv
 import matplotlib.pyplot as plt
 import joblib
 import os
+from io import BytesIO
 
 plt.switch_backend('Agg')
 # Initialize Flask app
@@ -65,12 +66,21 @@ def predict():
                 plt.ylabel("(MWh)")
                 plt.xticks(rotation='vertical')
                 plt.title("Forecasting Daily Electricity Consumption (MWh)")
-                plt.savefig(os.path.join('static', 'images', 'prediction_image.png'))
+                
+                # Save the plot to a BytesIO object instead of a file
+                img_io = BytesIO()
+                plt.savefig(img_io, format='png')
+                img_io.seek(0)  # Rewind the buffer to the beginning after saving
+    
+                #plt.savefig(os.path.join('static', 'images', 'prediction_image.png'))
                 plt.close()
+                
+                app.config['PLOT_IMAGE'] = img_io.getvalue()
+                
                 # Return predictions to the webpage along with image
                 return render_template('index.html', 
                                     predictions=predictions.tolist(), 
-                                    image_url=url_for('static', filename='images/prediction_image.png'))
+                                    image_url=url_for('plot_image'))
 
             else:
                 return jsonify({"error": "Invalid file type, please upload a CSV file."}), 400
@@ -80,6 +90,13 @@ def predict():
         
     # For GET requests, render the page without the image
     return render_template('index.html', image_url=None)
+
+@app.route('/plot.png')
+def plot_image():
+    # Get the plot image from the in-memory buffer (Flask config or session)
+    img_io = BytesIO(app.config['PLOT_IMAGE'])
+    img_io.seek(0)  # Rewind the buffer before returning
+    return send_file(img_io, mimetype='image/png')
 
 if __name__ == '__main__':
     app.run(debug=True)
